@@ -257,8 +257,9 @@ function downloadWasmFile(language: string, wasmPath: string): Promise<string | 
                 location: vscode.ProgressLocation.Notification,
             },
             async (progress, cancleToken) => {
-                // 使用fetch下载wasm文件
-                const wasmUrl = `https://tree-sitter.github.io/tree-sitter-${language}.wasm`;
+                const wasmId = getWasmId(language);
+                const packageName = getNpmPackageName(language);
+                const wasmUrl = `https://unpkg.com/${packageName}/${wasmId}.wasm`;
                 try {
                     const response = await fetch(wasmUrl);
                     if (!response.ok) {
@@ -287,9 +288,34 @@ function downloadWasmFile(language: string, wasmPath: string): Promise<string | 
 function getWasmId(language: string): string{
     let wasmId = `tree-sitter-${language}`;
 
-    // VS Code 中对于 C# 语言ID 与tree-sitter 的命名风格不一致，这里做矫正
+    // VS Code 中对于部分语言ID 与tree-sitter 的命名风格不一致，这里做矫正
     if (language === "csharp") {
         wasmId = "tree-sitter-c_sharp";
+    } else if (language === "typescriptreact") {
+        wasmId = "tree-sitter-tsx";
+    } else if (language === "javascriptreact") {
+        wasmId = "tree-sitter-jsx";
     }
     return wasmId;
+}
+
+/**
+ * 获取npm包名
+ * @param language 语言标识符
+ * @returns npm包名
+ */
+function getNpmPackageName(language: string): string{
+    // TypeScript 和 TSX 都来自 tree-sitter-typescript 包
+    if (language === "typescript" || language === "typescriptreact") {
+        return "tree-sitter-typescript";
+    }
+    // JavaScript 和 JSX 都来自 tree-sitter-javascript 包
+    if (language === "javascript" || language === "javascriptreact") {
+        return "tree-sitter-javascript";
+    }
+    // C# 使用 c_sharp 命名
+    if (language === "csharp") {
+        return "tree-sitter-c-sharp";
+    }
+    return `tree-sitter-${language}`;
 }
