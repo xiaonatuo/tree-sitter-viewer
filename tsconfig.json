@@ -6,6 +6,7 @@
 			"ES2022",
 			"DOM"
 		],
+		"types": ["node", "mocha"],
 		"sourceMap": true,
 		"rootDir": ".",
 		"strict": true,   /* enable all strict type-checking options */
@@ -17,12 +18,12 @@
 		// "noUnusedParameters": true,  /* Report errors for unused parameters. */
 	},
 	"include": [
-		"src/**/*.ts"
+		"src/**/*.ts",
+		"tests/**/*.ts"
 	],
 	"exclude": [
 		"node_modules",
 		"dist",
-		"out",
-		"tests"
+		"out"
 	]
 }
