@@ -230,7 +230,7 @@ function treeNodeToHtml(nodes: MiniNode[]): any {
         if (diff === 0) {
             idPath = idPath.slice(0, level);
         } else if (diff < 0) {
-            idPath = idPath.slice(0, diff - 1);
+            idPath = idPath.slice(0, level);
         }
         idPath.push('sp-' + id);
         prevLevel = level;
