@@ -292,9 +292,11 @@ function getWasmId(language: string): string{
     if (language === "csharp") {
         wasmId = "tree-sitter-c_sharp";
     } else if (language === "typescriptreact") {
+        // TSX 的 wasm 文件在 tree-sitter-typescript 包中
         wasmId = "tree-sitter-tsx";
     } else if (language === "javascriptreact") {
-        wasmId = "tree-sitter-jsx";
+        // JSX 语法包含在 tree-sitter-javascript 中，没有单独的 tree-sitter-jsx.wasm
+        wasmId = "tree-sitter-javascript";
     }
     return wasmId;
 }
