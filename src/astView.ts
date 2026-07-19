@@ -255,7 +255,7 @@ class AstWebview {
             case "selectEditorText":
                 const { startIndex, endIndex, isClick } = value;
                 if (isClick || (this.state.enableNodeMapping && this._webviewPanel.active)) {
-                    this.editorDecorationer.renderSelectRange(startIndex, endIndex);
+                    this.editorDecorationer?.renderSelectRange(startIndex, endIndex);
                 }
                 break;
             case "enableQuery":
@@ -368,7 +368,8 @@ class AstWebview {
         // 等待解析器初始化完成
         await this.parserReady;
 
-        this.editorDecorationer.clear();
+        // 清除编辑器装饰（如果编辑器装饰器已初始化）
+        this.editorDecorationer?.clear();
         Colors.reset();
         try {
             let flatCaptures: MiniCapture[] = [];
@@ -380,7 +381,7 @@ class AstWebview {
                         const miniNode = new MiniNode(node);
                         const color = Colors.getColorForCaptureName(name);
                         flatCaptures.push({ pattern, name, node: miniNode, color });
-                        this.editorDecorationer.renderCaptureRange(miniNode, color);
+                        this.editorDecorationer?.renderCaptureRange(miniNode, color);
                     }
                 }
 
