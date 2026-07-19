@@ -12,3 +12,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+.mocharc.yml
+AGENTS.md
+tsconfig.test.json
