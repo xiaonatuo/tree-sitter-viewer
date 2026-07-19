@@ -127,6 +127,11 @@ class AstWebview {
     private tsParser!: Parser;
     private astTree!: Tree;
     private editorDecorationer!: EditorDecorationer;
+    /**
+     * 解析器初始化完成的 Promise
+     * 在 tsParser 和 astTree 就绪前，所有需要使用它们的方法都会等待此 Promise
+     */
+    private readonly parserReady: Promise<void>;
     public get webviewPanel() {
         return this._webviewPanel;
     }
@@ -139,17 +144,20 @@ class AstWebview {
     constructor(doc: vscode.TextDocument, serializeAstWebview?: SerializeAstWebview) {
         this.doc = doc;
 
-        // 初始化webview面包
+        // 初始化webview面板
         this.initWebviewPanel(serializeAstWebview);
 
-        // 获取解析器解析语法树并刷新web页面
-        getParser(doc.languageId).then((parser) => {
+        // 初始化解析器并解析语法树
+        this.parserReady = getParser(doc.languageId).then((parser) => {
             this.tsParser = parser;
             this.astTree = this.tsParser.parse(doc.getText());
             // 设置日志
             this.setLogOutput();
             // 刷新web页面
             this.refreshWebview();
+        }).catch((error) => {
+            console.error("解析器初始化失败:", error);
+            vscode.window.showErrorMessage(`解析器初始化失败: ${error.message}`);
         });
 
         // 获取当前文档的编辑器
@@ -293,6 +301,9 @@ class AstWebview {
      * @param {vscode.TextDocumentChangeEvent} event 文档内容变化事件
      */
     private async handleChangeTextDocumentEvent(event: vscode.TextDocumentChangeEvent) {
+        // 等待解析器初始化完成
+        await this.parserReady;
+
         const { document, contentChanges } = event;
         if (document.uri.toString() === this.doc.uri.toString()) {
             for (const change of contentChanges) {
@@ -309,7 +320,10 @@ class AstWebview {
      * 处理文本编辑器选择变化事件
      * @param {vscode.TextEditorSelectionChangeEvent} event 文本编辑器选择变化事件
      */
-    private handleTextEditorChangeSelectEvent(event: vscode.TextEditorSelectionChangeEvent) {
+    private async handleTextEditorChangeSelectEvent(event: vscode.TextEditorSelectionChangeEvent) {
+        // 等待解析器初始化完成
+        await this.parserReady;
+
         const { textEditor, selections, kind } = event;
         const eventDoc = textEditor.document;
         const activeEditor = vscode.window.activeTextEditor;
@@ -350,7 +364,10 @@ class AstWebview {
      * 查询语法树节点
      * @param queryText 查询语句
      */
-    querySyntaxNode(queryText: string) {
+    async querySyntaxNode(queryText: string) {
+        // 等待解析器初始化完成
+        await this.parserReady;
+
         this.editorDecorationer.clear();
         Colors.reset();
         try {
