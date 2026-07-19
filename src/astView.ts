@@ -1,6 +1,6 @@
 import path from "path";
 import * as vscode from "vscode";
-import Parser, { Tree } from "web-tree-sitter";
+import { Tree, Point, Node, TreeCursor, Parser, Language, Query } from "web-tree-sitter";
 import { Colors } from "./colors";
 import { EditorDecorationer, selectedDecorationType } from "./editorDecorations";
 import { EditRange, editTree, getParser, handlerSyntaxNodeByRecursion, MiniCapture, MiniNode } from "./tsParser";
@@ -150,7 +150,10 @@ class AstWebview {
         // 初始化解析器并解析语法树
         this.parserReady = getParser(doc.languageId).then((parser) => {
             this.tsParser = parser;
-            this.astTree = this.tsParser.parse(doc.getText());
+            const tree = this.tsParser.parse(doc.getText());
+            if (tree) {
+                this.astTree = tree;
+            }
             // 设置日志
             this.setLogOutput();
             // 刷新web页面
@@ -337,7 +340,7 @@ class AstWebview {
             this.doc.uri.toString() === eventDoc.uri.toString()
         ) {
             const { anchor, active, isReversed, isEmpty } = selections[0];
-            let startPosition: Parser.Point, endPosition: Parser.Point;
+            let startPosition: Point, endPosition: Point;
             if (isEmpty) {
                 const range = eventDoc.getWordRangeAtPosition(anchor);
                 if (range) {
@@ -352,10 +355,12 @@ class AstWebview {
             // @ts-ignore
             if (startPosition && endPosition) {
                 const gotoNode = this.astTree.rootNode.descendantForPosition(startPosition, endPosition);
-                this._webviewPanel.webview.postMessage({
-                    command: "gotoNode",
-                    data: JSON.stringify(new MiniNode(gotoNode)),
-                });
+                if (gotoNode) {
+                    this._webviewPanel.webview.postMessage({
+                        command: "gotoNode",
+                        data: JSON.stringify(new MiniNode(gotoNode)),
+                    });
+                }
             }
         }
     }
@@ -374,13 +379,17 @@ class AstWebview {
         try {
             let flatCaptures: MiniCapture[] = [];
             if (queryText && this.state.enableQuery) {
-                const query = this.tsParser.getLanguage().query(queryText);
+                const language = this.tsParser.language;
+                if (!language) {
+                    throw new Error("解析器语言未设置");
+                }
+                const query = new Query(language, queryText);
                 const matches = query.matches(this.astTree.rootNode);
-                for (const { pattern, captures } of matches) {
+                for (const { patternIndex, captures } of matches) {
                     for (const { name, node } of captures) {
                         const miniNode = new MiniNode(node);
                         const color = Colors.getColorForCaptureName(name);
-                        flatCaptures.push({ pattern, name, node: miniNode, color });
+                        flatCaptures.push({ pattern: patternIndex, name, node: miniNode, color });
                         this.editorDecorationer?.renderCaptureRange(miniNode, color);
                     }
                 }
@@ -401,17 +410,9 @@ class AstWebview {
      */
     private setLogOutput() {
         if (this.state.logOutput) {
-            this.tsParser.setLogger((message: string, params: { [param: string]: string }, type: any) => {
-                // 通过判断type以适配不同版本的日志接口
-                if (type) {
-                    let paramsText = "";
-                    for (const key in params) {
-                        paramsText += `\t${key}: ${params[key]}`;
-                    }
-                    logOutput.appendLine(`[${type}]: ${message}. params:\n${paramsText}`);
-                } else {
-                    logOutput.appendLine(`${params ? "\t" : ""}${message}`);
-                }
+            this.tsParser.setLogger((message: string, isLex: boolean) => {
+                const prefix = isLex ? "[LEX]" : "[PARSE]";
+                logOutput.appendLine(`${prefix}: ${message}`);
             });
             logOutput.show();
         } else {

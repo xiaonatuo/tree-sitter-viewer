@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as vscode from "vscode";
-import Parser, { Edit, Point, SyntaxNode, TreeCursor } from "web-tree-sitter";
+import { Edit, Point, Node, TreeCursor, Language, Parser, Tree } from "web-tree-sitter";
 
 // wasm文件目录
 const WASM_DIR = path.join(__dirname, 'tree-sitter');
@@ -21,15 +21,7 @@ export interface QueryError extends RangeError{
 /**
  * 表示代码编辑范围，用于更新语法树
  */
-export class EditRange implements Edit {
-    startIndex: number;
-    oldEndIndex: number;
-    newEndIndex: number;
-
-    startPosition: Parser.Point;
-    oldEndPosition: Parser.Point;
-    newEndPosition: Parser.Point;
-
+export class EditRange extends Edit {
     /**
      * 构造函数，根据VSCode的文本变化事件创建编辑范围
      * @param editChangeEvent VSCode文本变化事件
@@ -38,13 +30,22 @@ export class EditRange implements Edit {
     constructor(editChangeEvent: vscode.TextDocumentContentChangeEvent, document: vscode.TextDocument) {
         const { range, rangeOffset, rangeLength, text } = editChangeEvent;
 
-        this.startIndex = rangeOffset;
-        this.oldEndIndex = rangeOffset + rangeLength;
-        this.newEndIndex = rangeOffset + text.length;
+        const startIndex = rangeOffset;
+        const oldEndIndex = rangeOffset + rangeLength;
+        const newEndIndex = rangeOffset + text.length;
 
-        this.startPosition = EditRange.asTSPoint(range.start);
-        this.oldEndPosition = EditRange.asTSPoint(range.end);
-        this.newEndPosition = EditRange.asTSPoint(document.positionAt(this.newEndIndex));
+        const startPosition = EditRange.asTSPoint(range.start);
+        const oldEndPosition = EditRange.asTSPoint(range.end);
+        const newEndPosition = EditRange.asTSPoint(document.positionAt(newEndIndex));
+
+        super({
+            startIndex,
+            oldEndIndex,
+            newEndIndex,
+            startPosition,
+            oldEndPosition,
+            newEndPosition
+        });
     }
 
     /**
@@ -52,7 +53,7 @@ export class EditRange implements Edit {
      * @param position VSCode的Position对象
      * @returns Tree-sitter的Point对象
      */
-    static asTSPoint(position: vscode.Position): Parser.Point {
+    static asTSPoint(position: vscode.Position): Point {
         const { line, character } = position;
         return { row: line, column: character };
     }
@@ -62,7 +63,7 @@ export class EditRange implements Edit {
      * @param Position Tree-sitter的Point对象
      * @returns VSCode的Position对象
      */
-    static asVsPosition(point: Parser.Point):vscode.Position{
+    static asVsPosition(point: Point):vscode.Position{
         const {row, column} = point;
 
         return new vscode.Position(row, column);
@@ -106,7 +107,7 @@ export class MiniNode {
      * @param node Tree-sitter的语法节点
      * @param walk Tree-sitter的游标对象
      */
-    constructor(node: SyntaxNode, walk?: TreeCursor) {
+    constructor(node: Node, walk?: TreeCursor) {
         this.id = node.id;
         this.typeId = node.typeId;
         this.grammarId = node.grammarId;
@@ -146,8 +147,8 @@ export interface MiniCapture{
  * @param handler 节点处理函数
  */
 export async function handlerSyntaxNodeByRecursion(
-    node: SyntaxNode,
-    handler: (node: SyntaxNode, walk: TreeCursor) => void
+    node: Node,
+    handler: (node: Node, walk: TreeCursor) => void
 ) {
     const walk = node.walk();
     let walkIn = true;
@@ -181,14 +182,15 @@ export async function handlerSyntaxNodeByRecursion(
  * @returns 更新后的语法树
  */
 export async function editTree(
-    tree: Parser.Tree,
+    tree: Tree,
     editChangeEvent: vscode.TextDocumentContentChangeEvent,
     document: vscode.TextDocument
-) {
+): Promise<Tree> {
     const parser = await getParser(document.languageId);
     const editRange = new EditRange(editChangeEvent, document);
     tree.edit(editRange);
-    return parser.parse(document.getText(), tree);
+    const newTree = parser.parse(document.getText(), tree);
+    return newTree!;
 }
 
 /**
@@ -220,7 +222,7 @@ async function initTSParser(language: string) {
     await Parser.init({locateFile: (pathName:string)=> path.join(WASM_DIR, pathName)});
     const parser = new Parser();
     const wasmPath = path.resolve(WASM_DIR, `${getWasmId(language)}.wasm`);
-    const languageWasm = await Parser.Language.load(wasmPath);
+    const languageWasm = await Language.load(wasmPath);
     parser.setLanguage(languageWasm);
     TS_PARSER.set(language, parser);
     return parser;
