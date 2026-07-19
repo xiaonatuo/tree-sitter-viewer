@@ -72,7 +72,7 @@
         "lint": "eslint src",
         "test": "vscode-test",
         "test:unit": "mocha --node-option import=ts-node/esm \"tests/**/*.test.ts\"",
-        "copy:wasm": "cpy node_modules/*/tree-sitter*.wasm dist/tree-sitter --flat"
+        "copy:wasm": "cpy node_modules/*/tree-sitter*.wasm dist/tree-sitter --flat && cpy node_modules/web-tree-sitter/*.wasm dist/tree-sitter --flat"
     },
     "devDependencies": {
         "@types/jsdom": "^28.0.3",
