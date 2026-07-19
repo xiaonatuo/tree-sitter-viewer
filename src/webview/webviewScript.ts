@@ -4,7 +4,7 @@ import { QueryEditor, QueryEditorTheme } from "./monaco";
 import { decorativeResults } from "./queryResult";
 
 const resizeElement = document.getElementById("row-resize") as HTMLElement;
-const rowContianer = document.getElementById("output-container") as HTMLElement;
+const rowContainer = document.getElementById("output-container") as HTMLElement;
 const rowNumberContainer = document.getElementById("row-number-container") as HTMLElement;
 const queryContainer = document.getElementById("query-container") as HTMLElement;
 const showAnonymousCheckbox = document.getElementById("show-anonymous-checkbox") as HTMLInputElement;
@@ -177,7 +177,7 @@ function refreshWebview(state: any, queryEditor: QueryEditor) {
  */
 function registerNodeEventListeners(): void {
     // 使用事件委托监听节点元素鼠标悬浮事件
-    rowContianer.addEventListener("mouseover", (event: MouseEvent) => {
+    rowContainer.addEventListener("mouseover", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
             VS_API.postMessage({ command: "selectEditorText", value: JSON.parse(JSON.stringify(element.dataset)) });
@@ -185,7 +185,7 @@ function registerNodeEventListeners(): void {
     });
 
     // 使用事件委托监听节点元素鼠标点击事件
-    rowContianer.addEventListener("click", (event: MouseEvent) => {
+    rowContainer.addEventListener("click", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
             document.querySelectorAll("a.node-link-selected").forEach((item) => {
@@ -206,7 +206,7 @@ function updateTree() {
     const nodes = VIEW_STATE.nodes;
     const nodeArray = typeof nodes === "string" ? JSON.parse(nodes) : nodes;
     const htmls = treeNodeToHtml(nodeArray);
-    rowContianer.innerHTML = htmls.rows;
+    rowContainer.innerHTML = htmls.rows;
     rowNumberContainer.innerHTML = htmls.rowNumbers;
 }
 
