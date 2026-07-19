@@ -265,6 +265,7 @@ class AstWebview {
             case "logOutput":
                 this.state.logOutput = value;
                 this.setLogOutput();
+                break;
             default:
         }
     }
