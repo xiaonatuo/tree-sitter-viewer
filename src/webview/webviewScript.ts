@@ -170,24 +170,22 @@ function refreshWebview(state: any, queryEditor: QueryEditor) {
 }
 
 /**
- * 更新语法树
- * @param {Array} nodes 节点数组
+ * 注册节点元素的事件监听器（使用事件委托，只注册一次）
+ *
+ * 通过事件委托机制，在父元素上监听事件并根据目标元素的类名判断是否处理。
+ * 避免每次更新 DOM 时重复注册监听器导致的内存泄漏。
  */
-function updateTree() {
-    const nodes = VIEW_STATE.nodes;
-    const nodeArray = typeof nodes === "string" ? JSON.parse(nodes) : nodes;
-    const htmls = treeNodeToHtml(nodeArray);
-    rowContianer.innerHTML = htmls.rows;
-    rowNumberContainer.innerHTML = htmls.rowNumbers;
-    // 监听节点元素鼠标悬浮事件
-    rowContianer.addEventListener("mouseover", (event) => {
+function registerNodeEventListeners(): void {
+    // 使用事件委托监听节点元素鼠标悬浮事件
+    rowContianer.addEventListener("mouseover", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
             VS_API.postMessage({ command: "selectEditorText", value: JSON.parse(JSON.stringify(element.dataset)) });
         }
     });
-    // 监听节点元素鼠标点击事件
-    rowContianer.addEventListener("click", (event) => {
+
+    // 使用事件委托监听节点元素鼠标点击事件
+    rowContianer.addEventListener("click", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
             document.querySelectorAll("a.node-link-selected").forEach((item) => {
@@ -199,6 +197,17 @@ function updateTree() {
             VS_API.postMessage({ command: "selectEditorText", value: JSON.parse(JSON.stringify(data)) });
         }
     });
+}
+
+/**
+ * 更新语法树
+ */
+function updateTree() {
+    const nodes = VIEW_STATE.nodes;
+    const nodeArray = typeof nodes === "string" ? JSON.parse(nodes) : nodes;
+    const htmls = treeNodeToHtml(nodeArray);
+    rowContianer.innerHTML = htmls.rows;
+    rowNumberContainer.innerHTML = htmls.rowNumbers;
 }
 
 /**
@@ -306,4 +315,5 @@ function initMonacoEditor() {
     const queryEditor = initMonacoEditor();
     listenWebviewMessage(queryEditor);
     listenHtmlElementEvent(queryEditor);
+    registerNodeEventListeners();
 })();

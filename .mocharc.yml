@@ -1,0 +1,18 @@
+# Mocha 配置文件
+# 用于运行单元测试
+
+# 测试文件匹配模式
+spec: "tests/**/*.test.ts"
+
+# 超时时间（毫秒）
+timeout: 5000
+
+# 显示测试进度
+reporter: spec
+
+# 递归查找测试文件
+recursive: true
+
+# 使用 ESM 模块
+node-option:
+  - import=ts-node/esm
