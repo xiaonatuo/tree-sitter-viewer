@@ -299,6 +299,9 @@ function getWasmId(language: string): string{
     } else if (language === "javascriptreact") {
         // JSX 语法包含在 tree-sitter-javascript 中，没有单独的 tree-sitter-jsx.wasm
         wasmId = "tree-sitter-javascript";
+    } else if (language === "jsonc") {
+        // JSONC 使用 tree-sitter-json 的 wasm 文件
+        wasmId = "tree-sitter-json";
     }
     return wasmId;
 }
@@ -320,6 +323,10 @@ function getNpmPackageName(language: string): string{
     // C# 使用 c_sharp 命名
     if (language === "csharp") {
         return "tree-sitter-c-sharp";
+    }
+    // JSONC 使用 tree-sitter-json 包
+    if (language === "jsonc") {
+        return "tree-sitter-json";
     }
     return `tree-sitter-${language}`;
 }

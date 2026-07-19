@@ -27,6 +27,9 @@ describe("tsParser 语言映射函数测试", () => {
             } else if (language === "javascriptreact") {
                 // JSX 语法包含在 tree-sitter-javascript 中，没有单独的 tree-sitter-jsx.wasm
                 wasmId = "tree-sitter-javascript";
+            } else if (language === "jsonc") {
+                // JSONC 使用 tree-sitter-json 的 wasm 文件
+                wasmId = "tree-sitter-json";
             }
             return wasmId;
         }
@@ -48,6 +51,10 @@ describe("tsParser 语言映射函数测试", () => {
 
         it("javascriptreact 应映射到 tree-sitter-javascript（JSX 语法包含在 tree-sitter-javascript 中）", () => {
             assert.strictEqual(getWasmId("javascriptreact"), "tree-sitter-javascript");
+        });
+
+        it("jsonc 应映射到 tree-sitter-json", () => {
+            assert.strictEqual(getWasmId("jsonc"), "tree-sitter-json");
         });
     });
 
@@ -73,6 +80,10 @@ describe("tsParser 语言映射函数测试", () => {
             if (language === "csharp") {
                 return "tree-sitter-c-sharp";
             }
+            // JSONC 使用 tree-sitter-json 包
+            if (language === "jsonc") {
+                return "tree-sitter-json";
+            }
             return `tree-sitter-${language}`;
         }
 
@@ -88,6 +99,10 @@ describe("tsParser 语言映射函数测试", () => {
 
         it("C# 应返回 tree-sitter-c-sharp", () => {
             assert.strictEqual(getNpmPackageName("csharp"), "tree-sitter-c-sharp");
+        });
+
+        it("JSONC 应返回 tree-sitter-json", () => {
+            assert.strictEqual(getNpmPackageName("jsonc"), "tree-sitter-json");
         });
 
         it("其他语言应返回 tree-sitter-{language} 格式", () => {
@@ -112,6 +127,9 @@ describe("tsParser 语言映射函数测试", () => {
             } else if (language === "javascriptreact") {
                 // JSX 语法包含在 tree-sitter-javascript 中，没有单独的 tree-sitter-jsx.wasm
                 wasmId = "tree-sitter-javascript";
+            } else if (language === "jsonc") {
+                // JSONC 使用 tree-sitter-json 的 wasm 文件
+                wasmId = "tree-sitter-json";
             }
             return wasmId;
         }
@@ -125,6 +143,9 @@ describe("tsParser 语言映射函数测试", () => {
             }
             if (language === "csharp") {
                 return "tree-sitter-c-sharp";
+            }
+            if (language === "jsonc") {
+                return "tree-sitter-json";
             }
             return `tree-sitter-${language}`;
         }
@@ -164,6 +185,15 @@ describe("tsParser 语言映射函数测试", () => {
             const url = `https://unpkg.com/${packageName}/${wasmId}.wasm`;
 
             assert.strictEqual(url, "https://unpkg.com/tree-sitter-python/tree-sitter-python.wasm");
+        });
+
+        it("JSONC 应生成正确的 unpkg URL", () => {
+            const language = "jsonc";
+            const wasmId = getWasmId(language);
+            const packageName = getNpmPackageName(language);
+            const url = `https://unpkg.com/${packageName}/${wasmId}.wasm`;
+
+            assert.strictEqual(url, "https://unpkg.com/tree-sitter-json/tree-sitter-json.wasm");
         });
     });
 });
