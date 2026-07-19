@@ -13,12 +13,10 @@ describe("idPath 切片逻辑测试", () => {
     it("diff === 0 时应截断到当前深度", () => {
         const idPath = ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5"];
         const level = 3;
-        const diff = 0;
+        const prevLevel = 3;
 
         let result: string[];
-        if (diff === 0) {
-            result = idPath.slice(0, level);
-        } else if (diff < 0) {
+        if (level <= prevLevel) {
             result = idPath.slice(0, level);
         } else {
             result = [...idPath];
@@ -37,12 +35,10 @@ describe("idPath 切片逻辑测试", () => {
     it("diff < 0 时应截断到目标深度", () => {
         const idPath = ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5"];
         const level = 3;
-        const diff = level - 5; // diff = -2
+        const prevLevel = 5;
 
         let result: string[];
-        if (diff === 0) {
-            result = idPath.slice(0, level);
-        } else if (diff < 0) {
+        if (level <= prevLevel) {
             result = idPath.slice(0, level);
         } else {
             result = [...idPath];
@@ -61,7 +57,8 @@ describe("idPath 切片逻辑测试", () => {
     it("验证旧代码的 bug：diff - 1 会导致多移除一个元素", () => {
         const idPath = ["sp-1", "sp-2", "sp-3", "sp-4", "sp-5"];
         const level = 3;
-        const diff = level - 5; // diff = -2
+        const prevLevel = 5;
+        const diff = level - prevLevel; // diff = -2
 
         // 旧代码的逻辑
         const buggyResult = idPath.slice(0, diff - 1); // slice(0, -3)
@@ -76,12 +73,10 @@ describe("idPath 切片逻辑测试", () => {
     it("diff > 0 时应保持 idPath 不变", () => {
         const idPath = ["sp-1", "sp-2", "sp-3"];
         const level = 5;
-        const diff = level - 3; // diff = 2
+        const prevLevel = 3;
 
         let result: string[];
-        if (diff === 0) {
-            result = idPath.slice(0, level);
-        } else if (diff < 0) {
+        if (level <= prevLevel) {
             result = idPath.slice(0, level);
         } else {
             result = [...idPath];
@@ -96,12 +91,10 @@ describe("idPath 切片逻辑测试", () => {
     it("level 为 0 时应返回空数组", () => {
         const idPath = ["sp-1", "sp-2", "sp-3"];
         const level = 0;
-        const diff = level - 3; // diff = -3
+        const prevLevel = 3;
 
         let result: string[];
-        if (diff === 0) {
-            result = idPath.slice(0, level);
-        } else if (diff < 0) {
+        if (level <= prevLevel) {
             result = idPath.slice(0, level);
         } else {
             result = [...idPath];

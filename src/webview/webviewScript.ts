@@ -226,10 +226,7 @@ function treeNodeToHtml(nodes: MiniNode[]): any {
         const { id, type, fieldName, level, isNamed, startIndex, endIndex, startPosition, endPosition } = nodes[i];
 
         // 根据节点的深度，计算出ID路径，并转换为锚点类选择器
-        const diff = level - prevLevel;
-        if (diff === 0) {
-            idPath = idPath.slice(0, level);
-        } else if (diff < 0) {
+        if (level <= prevLevel) {
             idPath = idPath.slice(0, level);
         }
         idPath.push('sp-' + id);
