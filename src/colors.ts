@@ -4,8 +4,8 @@ let NAMES: string[] = [];
 
 export class Colors {
     /**
-     * 根据捕获的名称计算颜色的索引
-     * @param name 捕获节点的名称
+     * Compute the color index from the capture name
+     * @param name Name of the captured node
      * @returns 
      */
     static getColorForCaptureName(name: string): string {
@@ -18,7 +18,7 @@ export class Colors {
     }
 
     /**
-     * 重置颜色样式
+     * Reset color styles
      */
     static reset() {
         NAMES = [];

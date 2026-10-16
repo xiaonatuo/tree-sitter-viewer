@@ -6,13 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [1.0.8] - 2026-07-20
 
-### 新增功能
-- 添加 JSONC 语言支持（tree-sitter-json 现在同时支持 JSON 和 JSONC）
-- 新增 50 个单元测试用例，覆盖核心逻辑
+### Features
+- Add JSONC language support (tree-sitter-json now supports both JSON and JSONC)
+- Add 50 unit test cases covering core logic
 
-### 依赖升级
-- 升级 web-tree-sitter 到 0.26.11（API 重构）
-- 升级以下 tree-sitter 语言包到最新版本：
+### Dependency Upgrades
+- Upgrade web-tree-sitter to 0.26.11 (API refactor)
+- Upgrade the following tree-sitter language packages to their latest versions:
   - tree-sitter-bash: 0.23.3 → 0.25.1
   - tree-sitter-c: 0.23.5 → 0.24.1
   - tree-sitter-c-sharp: 0.23.1 → 0.23.5
@@ -25,31 +25,31 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
   - tree-sitter-rust: 0.23.2 → 0.24.0
   - tree-sitter-scala: 0.23.4 → 0.24.0
 
-### Bug 修复
-- 修复 JSX 语言 wasm 文件下载失败的问题（tree-sitter-javascript 包中没有 tree-sitter-jsx.wasm）
-- 修复事件监听器泄漏问题（使用事件委托模式）
-- 修复构造函数竞态条件（添加 parserReady Promise）
-- 修复 editorDecorationer 可能为 undefined 导致的崩溃
-- 修复 idPath 切片偏移一位的问题
-- 修复变量名拼写错误（rowContianer → rowContainer）
-- 修复 switch 语句缺少 break 导致的穿透问题
-- 修复 webpack 编译错误（tsconfig 配置问题）
+### Bug Fixes
+- Fix JSX language wasm file download failure (the tree-sitter-javascript package has no tree-sitter-jsx.wasm)
+- Fix event listener leak (use event delegation pattern)
+- Fix constructor race condition (add parserReady Promise)
+- Fix crash caused by editorDecorationer possibly being undefined
+- Fix off-by-one error in idPath slicing
+- Fix variable name typo (rowContianer → rowContainer)
+- Fix fall-through caused by missing break in switch statement
+- Fix webpack build error (tsconfig configuration issue)
 
-### 优化
-- 简化 idPath 切片逻辑
-- 更新 AGENTS.md 文档
-- 配置单元测试框架（Mocha + jsdom + ts-node）
-- 修复 VS Code 中测试文件类型识别问题
-- 优化打包配置，移除不需要的文件（.mocharc.yml, AGENTS.md, tsconfig.test.json）
+### Improvements
+- Simplify idPath slicing logic
+- Update AGENTS.md documentation
+- Set up unit test framework (Mocha + jsdom + ts-node)
+- Fix test file type recognition in VS Code
+- Optimize packaging configuration, remove unneeded files (.mocharc.yml, AGENTS.md, tsconfig.test.json)
 
 ## [1.0.6] - 2025-07-15
 
-### 新增功能
-- 增加语法树查询功能
-- 调整在不勾选映射节点的情况下，点击代码编辑器时语法树视图自动跳转对应语法节点位置
+### Features
+- Add syntax tree query feature
+- When node mapping is unchecked, clicking in the code editor now makes the syntax tree view jump to the corresponding node
 
-### Bug 修复
-- 修复语法树查询结果在页面渲染不全的bug
-- 优化资源管理器中右键查看语法树菜单的显示时机
-- 调整捕获名称渲染颜色的优先级
-- 优化Ast视图页面样式
+### Bug Fixes
+- Fix syntax tree query results not rendering completely on the page
+- Improve when the "View Syntax Tree" context menu appears in the Explorer
+- Adjust priority of capture name rendering colors
+- Improve AST view page styles

@@ -1,14 +1,14 @@
 import assert from "assert";
 
 /**
- * 测试 EditRange 的静态方法逻辑
+ * Tests the static method logic of EditRange
  *
- * 由于 EditRange 依赖 VS Code API，我们直接测试其转换逻辑。
- * 这些测试验证 Position 和 Point 之间的转换是否正确。
+ * Since EditRange depends on the VS Code API, we test its conversion logic directly.
+ * These tests verify that conversion between Position and Point is correct.
  */
-describe("EditRange 位置转换逻辑测试", () => {
+describe("EditRange position conversion logic", () => {
     /**
-     * 模拟 VS Code Position 对象
+     * Simulated VS Code Position object
      */
     interface VSCodePosition {
         line: number;
@@ -16,7 +16,7 @@ describe("EditRange 位置转换逻辑测试", () => {
     }
 
     /**
-     * 模拟 Tree-sitter Point 对象
+     * Simulated Tree-sitter Point object
      */
     interface TSPoint {
         row: number;
@@ -24,8 +24,8 @@ describe("EditRange 位置转换逻辑测试", () => {
     }
 
     /**
-     * 模拟 asTSPoint 函数的逻辑
-     * 将 VS Code Position 转换为 Tree-sitter Point
+     * Simulated asTSPoint function logic
+     * Converts a VS Code Position to a Tree-sitter Point
      */
     function asTSPoint(position: VSCodePosition): TSPoint {
         const { line, character } = position;
@@ -33,16 +33,16 @@ describe("EditRange 位置转换逻辑测试", () => {
     }
 
     /**
-     * 模拟 asVsPosition 函数的逻辑
-     * 将 Tree-sitter Point 转换为 VS Code Position
+     * Simulated asVsPosition function logic
+     * Converts a Tree-sitter Point to a VS Code Position
      */
     function asVsPosition(point: TSPoint): VSCodePosition {
         const { row, column } = point;
         return { line: row, character: column };
     }
 
-    describe("asTSPoint 转换测试", () => {
-        it("应正确转换第一行第一列", () => {
+    describe("asTSPoint conversion", () => {
+        it("should correctly convert first line, first column", () => {
             const position: VSCodePosition = { line: 0, character: 0 };
             const point = asTSPoint(position);
 
@@ -50,7 +50,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(point.column, 0);
         });
 
-        it("应正确转换非零位置", () => {
+        it("should correctly convert a non-zero position", () => {
             const position: VSCodePosition = { line: 5, character: 10 };
             const point = asTSPoint(position);
 
@@ -58,7 +58,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(point.column, 10);
         });
 
-        it("应正确转换大行号", () => {
+        it("should correctly convert a large line number", () => {
             const position: VSCodePosition = { line: 1000, character: 200 };
             const point = asTSPoint(position);
 
@@ -66,7 +66,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(point.column, 200);
         });
 
-        it("应正确转换行尾位置", () => {
+        it("should correctly convert an end-of-line position", () => {
             const position: VSCodePosition = { line: 10, character: 80 };
             const point = asTSPoint(position);
 
@@ -75,8 +75,8 @@ describe("EditRange 位置转换逻辑测试", () => {
         });
     });
 
-    describe("asVsPosition 转换测试", () => {
-        it("应正确转换第一行第一列", () => {
+    describe("asVsPosition conversion", () => {
+        it("should correctly convert first line, first column", () => {
             const point: TSPoint = { row: 0, column: 0 };
             const position = asVsPosition(point);
 
@@ -84,7 +84,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(position.character, 0);
         });
 
-        it("应正确转换非零位置", () => {
+        it("should correctly convert a non-zero position", () => {
             const point: TSPoint = { row: 5, column: 10 };
             const position = asVsPosition(point);
 
@@ -92,7 +92,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(position.character, 10);
         });
 
-        it("应正确转换大行号", () => {
+        it("should correctly convert a large line number", () => {
             const point: TSPoint = { row: 1000, column: 200 };
             const position = asVsPosition(point);
 
@@ -101,8 +101,8 @@ describe("EditRange 位置转换逻辑测试", () => {
         });
     });
 
-    describe("双向转换测试", () => {
-        it("asTSPoint -> asVsPosition 应返回原始值", () => {
+    describe("round-trip conversion", () => {
+        it("asTSPoint -> asVsPosition should return the original value", () => {
             const original: VSCodePosition = { line: 5, character: 10 };
             const point = asTSPoint(original);
             const result = asVsPosition(point);
@@ -111,7 +111,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(result.character, original.character);
         });
 
-        it("asVsPosition -> asTSPoint 应返回原始值", () => {
+        it("asVsPosition -> asTSPoint should return the original value", () => {
             const original: TSPoint = { row: 5, column: 10 };
             const position = asVsPosition(original);
             const result = asTSPoint(position);
@@ -120,7 +120,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(result.column, original.column);
         });
 
-        it("应正确处理零值双向转换", () => {
+        it("should correctly round-trip zero values", () => {
             const original: VSCodePosition = { line: 0, character: 0 };
             const point = asTSPoint(original);
             const result = asVsPosition(point);
@@ -129,7 +129,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(result.character, 0);
         });
 
-        it("应正确处理大值双向转换", () => {
+        it("should correctly round-trip large values", () => {
             const original: VSCodePosition = { line: 9999, character: 999 };
             const point = asTSPoint(original);
             const result = asVsPosition(point);
@@ -139,8 +139,8 @@ describe("EditRange 位置转换逻辑测试", () => {
         });
     });
 
-    describe("坐标系统语义验证", () => {
-        it("VS Code line 对应 Tree-sitter row", () => {
+    describe("coordinate system semantics", () => {
+        it("VS Code line maps to Tree-sitter row", () => {
             const position: VSCodePosition = { line: 42, character: 0 };
             const point = asTSPoint(position);
 
@@ -148,7 +148,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(point.row, 42);
         });
 
-        it("VS Code character 对应 Tree-sitter column", () => {
+        it("VS Code character maps to Tree-sitter column", () => {
             const position: VSCodePosition = { line: 0, character: 42 };
             const point = asTSPoint(position);
 
@@ -156,7 +156,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(point.column, 42);
         });
 
-        it("Tree-sitter row 对应 VS Code line", () => {
+        it("Tree-sitter row maps to VS Code line", () => {
             const point: TSPoint = { row: 42, column: 0 };
             const position = asVsPosition(point);
 
@@ -164,7 +164,7 @@ describe("EditRange 位置转换逻辑测试", () => {
             assert.strictEqual(position.line, 42);
         });
 
-        it("Tree-sitter column 对应 VS Code character", () => {
+        it("Tree-sitter column maps to VS Code character", () => {
             const point: TSPoint = { row: 0, column: 42 };
             const position = asVsPosition(point);
 

@@ -39,7 +39,7 @@ The webview bundle includes Monaco editor (scheme language only) via `monaco-edi
 
 ## Conventions
 
-- Comments and UI strings are in Chinese (中文).
+- Comments and UI strings are in English.
 - `tsconfig.json` targets ES2022 with CommonJS modules and strict mode.
 - ESLint rules: `curly`, `eqeqeq`, `no-throw-literal`, `semi` as warnings; import naming must be camelCase or PascalCase.
 - Tests use `@vscode/test-cli` with Mocha. Test output goes to `out/test/**/*.test.js` (compiled from `src/`).

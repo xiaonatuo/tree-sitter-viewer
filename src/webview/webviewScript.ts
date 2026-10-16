@@ -31,10 +31,10 @@ const VIEW_STATE: AstWebviewState = {
 };
 
 /**
- * 监听webview发送的消息
+ * Listen for messages sent to the webview
  */
 function listenWebviewMessage(queryEditor: QueryEditor) {
-    // 添加接收消息的监听
+    // Add a listener for incoming messages
     window.addEventListener("message", (event) => {
         const { command, data } = event.data;
         switch (command) {
@@ -42,18 +42,18 @@ function listenWebviewMessage(queryEditor: QueryEditor) {
                 refreshWebview(JSON.parse(data), queryEditor);
                 break;
             case "scroll":
-                // 随编辑器滚动
+                // Scroll along with the editor
                 const { line } = JSON.parse(data);
                 const items = document.getElementsByClassName(`row-${line}`);
                 items &&
                     items.length > 0 &&
                     items[0].scrollIntoView({
-                        behavior: "smooth", // 平滑滚动
-                        block: "start", // 元素顶部对齐视口顶部
+                        behavior: "smooth", // Smooth scrolling
+                        block: "start", // Align element top with viewport top
                     });
                 break;
             case "gotoNode":
-                // 定位到指定节点
+                // Go to the given node
                 const { id } = JSON.parse(data);
                 const element = document.getElementById(id);
                 if (element) {
@@ -77,16 +77,16 @@ function listenWebviewMessage(queryEditor: QueryEditor) {
 }
 
 /**
- * 监听Html元素事件
+ * Listen for HTML element events
  */
 function listenHtmlElementEvent(queryEditor: QueryEditor) {
-    // 监听语法树编辑器文本内容修改事件
+    // Listen for text changes in the syntax tree query editor
     queryEditor.onValueChange((value) => {
         VIEW_STATE.queryText = value;
         VS_API.postMessage({ command: "queryNode", value });
         VS_API.setState(VIEW_STATE);
     });
-    // 监听显示匿名节点选择框的修改事件，并发送对应状态
+    // Listen for changes to the show anonymous nodes checkbox and send its state
     showAnonymousCheckbox!.addEventListener("change", () => {
         const checked = showAnonymousCheckbox!.checked;
         VIEW_STATE.showAnonymousNodes = checked;
@@ -94,7 +94,7 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
         VS_API.setState(VIEW_STATE);
     });
 
-    // 监听启用查询选择框的修改事件，并发送对应状态
+    // Listen for changes to the enable query checkbox and send its state
     enableQueryCheckbox.addEventListener("change", () => {
         const checked = enableQueryCheckbox.checked;
         VIEW_STATE.enableQuery = checked;
@@ -103,7 +103,7 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
         VS_API.setState(VIEW_STATE);
     });
 
-    // 监听节点映射选择框的修改事件，并发送对应状态
+    // Listen for changes to the node mapping checkbox and send its state
     nodeMappingCheckbox.addEventListener("change", () => {
         const checked = nodeMappingCheckbox.checked;
         VIEW_STATE.enableNodeMapping = checked;
@@ -111,7 +111,7 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
         VS_API.setState(VIEW_STATE);
     });
 
-    // 监听输出日志选择框的修改事件，并发送对应状态
+    // Listen for changes to the log output checkbox and send its state
     logOutputCheckbox.addEventListener("change", () => {
         const checked = logOutputCheckbox.checked;
         VIEW_STATE.logOutput = checked;
@@ -119,7 +119,7 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
         VS_API.setState(VIEW_STATE);
     });
 
-    // 监听resizeElement的鼠标点击拖动的事件
+    // Listen for mouse drag events on resizeElement
     resizeElement.addEventListener("mousedown", (event) => {
         const startY = event.clientY;
         const startHeight = queryContainer.offsetHeight;
@@ -142,7 +142,7 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
         document.addEventListener("mouseup", onMouseUp);
     });
 
-    // 监听body的鼠标点击事件，如果点击的不是节点，则发送一个空的位置数据
+    // Listen for clicks on body; if the click is not on a node, send empty position data
     document.body.addEventListener('click', ({ target }) => {
         //@ts-ignore
         if (!target.classList.contains("node-link")) {
@@ -152,8 +152,8 @@ function listenHtmlElementEvent(queryEditor: QueryEditor) {
 }
 
 /**
- * 刷新web视图
- * @param state 视图状态数据
+ * Refresh the webview
+ * @param state View state data
  */
 function refreshWebview(state: any, queryEditor: QueryEditor) {
     Object.assign(VIEW_STATE, state);
@@ -170,13 +170,13 @@ function refreshWebview(state: any, queryEditor: QueryEditor) {
 }
 
 /**
- * 注册节点元素的事件监听器（使用事件委托，只注册一次）
+ * Register event listeners for node elements (using event delegation, registered only once)
  *
- * 通过事件委托机制，在父元素上监听事件并根据目标元素的类名判断是否处理。
- * 避免每次更新 DOM 时重复注册监听器导致的内存泄漏。
+ * Using event delegation, listen on the parent element and decide whether to handle based on the target's class name.
+ * This avoids memory leaks caused by re-registering listeners on every DOM update.
  */
 function registerNodeEventListeners(): void {
-    // 使用事件委托监听节点元素鼠标悬浮事件
+    // Use event delegation to listen for mouseover on node elements
     rowContainer.addEventListener("mouseover", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
@@ -184,7 +184,7 @@ function registerNodeEventListeners(): void {
         }
     });
 
-    // 使用事件委托监听节点元素鼠标点击事件
+    // Use event delegation to listen for clicks on node elements
     rowContainer.addEventListener("click", (event: MouseEvent) => {
         const element = event.target as HTMLElement;
         if (element.classList.contains("node-link")) {
@@ -200,7 +200,7 @@ function registerNodeEventListeners(): void {
 }
 
 /**
- * 更新语法树
+ * Update the syntax tree
  */
 function updateTree() {
     const nodes = VIEW_STATE.nodes;
@@ -211,21 +211,21 @@ function updateTree() {
 }
 
 /**
- * 将语法树节点转换为HTML
- * @param {Array<MiniNode>} nodes 节点数组
- * @returns {any} 包含HTML字符串的对象
+ * Convert syntax tree nodes to HTML
+ * @param {Array<MiniNode>} nodes Array of nodes
+ * @returns {any} Object containing HTML strings
  */
 function treeNodeToHtml(nodes: MiniNode[]): any {
     let rows = "", rowNumbers = "";
 
-    // 上次遍历的深度
+    // Depth of the previous iteration
     let prevLevel = -1;
-    // 遍历的节点id数组
+    // Array of traversed node ids
     let idPath: string[] = [];
     for (let i = 0; i < nodes.length; i++) {
         const { id, type, fieldName, level, isNamed, startIndex, endIndex, startPosition, endPosition } = nodes[i];
 
-        // 根据节点的深度，计算出ID路径，并转换为锚点类选择器
+        // Compute the ID path from the node depth and convert it to anchor class selectors
         if (level <= prevLevel) {
             idPath = idPath.slice(0, level);
         }
@@ -235,7 +235,7 @@ function treeNodeToHtml(nodes: MiniNode[]): any {
         const idPathClassName = idPath.join(' ');
         const { row: startRow, column: startColumn } = startPosition;
         const { row: endRow, column: endColumn } = endPosition;
-        // 设置缩进
+        // Set indentation
         let indentHtml = ``;
         for (let i = 0; i < level; i++) {
             indentHtml += `<span class="indent d-${i}">&nbsp;&nbsp;</span>`;
@@ -260,14 +260,14 @@ function treeNodeToHtml(nodes: MiniNode[]): any {
 }
 
 /**
- * 获取webview页面的主题信息
- * @returns 编辑器主题配置
+ * Get the theme information of the webview page
+ * @returns Editor theme configuration
  */
 function getThemeInfo(): QueryEditorTheme {
     const themeKind = document.body.dataset.vscodeThemeKind;
     const themeStyle = window.getComputedStyle(document.body);
 
-    // 将RGB格式的颜色字符进行转换
+    // Convert RGB color strings
     const rgbStringToHex = (colorStr: string): string => {
         if (colorStr.startsWith('#')) {
             return colorStr;
@@ -286,7 +286,7 @@ function getThemeInfo(): QueryEditorTheme {
     };
     return {
         themeKind,
-        // colors 的属性key请参考monaco官方文档
+        // For colors property keys, see the official monaco documentation
         colors: {
             'editor.background': rgbStringToHex(themeStyle.backgroundColor)
         }
@@ -294,7 +294,7 @@ function getThemeInfo(): QueryEditorTheme {
 }
 
 /**
- * 初始化一个语法树查询编辑器
+ * Initialize a syntax tree query editor
  */
 function initMonacoEditor() {
     const editorElement = document.getElementById('query-container');
@@ -306,7 +306,7 @@ function initMonacoEditor() {
 }
 
 /**
- * 匿名自运行函数
+ * Anonymous self-invoking function
  */
 (function () {
     const queryEditor = initMonacoEditor();
