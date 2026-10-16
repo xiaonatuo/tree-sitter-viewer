@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { MiniNode } from "./tsParser";
 
 /**
- * 装饰类型
+ * Decoration type
  */
 class DecorationType {
     private _decorationType: vscode.TextEditorDecorationType;
@@ -24,7 +24,7 @@ class DecorationType {
     }
 
     /**
-     * 渲染指定的范围
+     * Render the given range
      * @param range 
      */
     render(range: vscode.Range) {
@@ -33,7 +33,7 @@ class DecorationType {
     }
 
     /**
-     * 清理所有的装饰
+     * Clear all decorations
      */
     clear() {
         this._ranges = [];
@@ -41,7 +41,7 @@ class DecorationType {
     }
 }
 
-// 编辑器内的选中装饰类型，即编辑器内字符选中后的样式
+// Selection decoration type in the editor, i.e. the style of selected characters
 export const selectedDecorationType = vscode.window.createTextEditorDecorationType({
     backgroundColor: "#125381 !important",
     borderRadius: "4px",
@@ -50,10 +50,10 @@ export const selectedDecorationType = vscode.window.createTextEditorDecorationTy
     border: "1px solid #ea00b1",
 });
 
-// 编辑器内的颜色装饰类型
+// Color decoration types in the editor
 const editorDecorationType: Map<string, DecorationType> = new Map();
 /**
- * 获取颜色对应的装饰类型
+ * Get the decoration type for a color
  * @param color 
  * @param editor 
  * @returns 
@@ -69,7 +69,7 @@ export function getDecorationTypeForColor(color: string, editor: vscode.TextEdit
 
 
 /**
- * 编辑器装饰器
+ * Editor decorator
  */
 export class EditorDecorationer {
     private doc: vscode.TextDocument;
@@ -78,7 +78,7 @@ export class EditorDecorationer {
     }
 
     /**
-     * 渲染选中的范围
+     * Render the selected range
      * @param startIndex 
      * @param endIndex 
      */
@@ -89,13 +89,13 @@ export class EditorDecorationer {
             const end = this.doc.positionAt(endIndex);
             
             this.editor.setDecorations(selectedDecorationType, [new vscode.Range(start, end)]);
-            // 滚动到选中的内容
+            // Scroll to the selected content
             this.editor.revealRange(new vscode.Selection(start, end), vscode.TextEditorRevealType.InCenter);
         }
     }
 
     /**
-     * 渲染捕获节点的范围 
+     * Render the range of a captured node 
      * @param node 
      * @param color 
      */
@@ -107,7 +107,7 @@ export class EditorDecorationer {
     }
 
     /**
-     * 清理所有的装饰
+     * Clear all decorations
      */
     clear() {
         editorDecorationType.forEach((value) => value.clear());

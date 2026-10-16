@@ -2,17 +2,17 @@ import assert from "assert";
 import { JSDOM } from "jsdom";
 
 /**
- * 测试 webviewScript 中的事件委托机制
+ * Tests the event delegation mechanism in webviewScript
  *
- * 验证事件监听器只注册一次，使用事件委托处理动态元素的事件。
+ * Verifies event listeners are registered only once, using event delegation to handle events from dynamic elements.
  */
-describe("webviewScript 事件委托测试", () => {
+describe("webviewScript event delegation", () => {
     let dom: JSDOM;
     let document: Document;
     let rowContainer: HTMLElement;
 
     beforeEach(() => {
-        // 创建模拟的 DOM 环境
+        // Create a simulated DOM environment
         dom = new JSDOM(`<!DOCTYPE html>
             <html>
             <body>
@@ -29,18 +29,18 @@ describe("webviewScript 事件委托测试", () => {
     });
 
     /**
-     * 验证事件委托机制：动态添加的元素也能触发事件
+     * Verifies event delegation: dynamically added elements also trigger events
      *
-     * 此测试模拟事件委托的工作原理：
-     * 1. 在父元素上注册事件监听器
-     * 2. 动态添加子元素
-     * 3. 触发子元素的事件，验证父元素的监听器能正确捕获
+     * This test simulates how event delegation works:
+     * 1. Register an event listener on the parent element
+     * 2. Dynamically add child elements
+     * 3. Trigger an event on the child and verify the parent listener catches it
      */
-    it("事件委托应能处理动态添加的元素", () => {
+    it("event delegation should handle dynamically added elements", () => {
         let eventTriggered = false;
         let targetElement: HTMLElement | null = null;
 
-        // 在父元素上使用事件委托
+        // Use event delegation on the parent element
         rowContainer.addEventListener("click", (event: MouseEvent) => {
             const target = event.target as HTMLElement;
             if (target.classList.contains("node-link")) {
@@ -49,33 +49,33 @@ describe("webviewScript 事件委托测试", () => {
             }
         });
 
-        // 动态添加子元素
+        // Dynamically add a child element
         const nodeLink = document.createElement("a");
         nodeLink.classList.add("node-link");
         nodeLink.textContent = "test-node";
         rowContainer.appendChild(nodeLink);
 
-        // 触发点击事件
+        // Trigger a click event
         const clickEvent = new dom.window.MouseEvent("click", {
             bubbles: true,
             cancelable: true,
         });
         nodeLink.dispatchEvent(clickEvent);
 
-        assert.strictEqual(eventTriggered, true, "事件应被触发");
-        assert.strictEqual(targetElement, nodeLink, "目标元素应正确");
+        assert.strictEqual(eventTriggered, true, "Event should have been triggered");
+        assert.strictEqual(targetElement, nodeLink, "Target element should be correct");
     });
 
     /**
-     * 验证事件委托不会因为 DOM 更新而重复注册
+     * Verifies event delegation is not re-registered on DOM updates
      *
-     * 此测试确保事件监听器只注册一次，
-     * 即使 innerHTML 被多次更新，事件处理器也不会累积。
+     * This test ensures event listeners are registered only once,
+     * so handlers do not accumulate even when innerHTML is updated many times.
      */
-    it("事件监听器不应随 DOM 更新而累积", () => {
+    it("event listeners should not accumulate with DOM updates", () => {
         let callCount = 0;
 
-        // 注册事件监听器（模拟 registerNodeEventListeners）
+        // Register the event listener (simulates registerNodeEventListeners)
         rowContainer.addEventListener("click", (event: MouseEvent) => {
             const target = event.target as HTMLElement;
             if (target.classList.contains("node-link")) {
@@ -83,12 +83,12 @@ describe("webviewScript 事件委托测试", () => {
             }
         });
 
-        // 模拟多次 updateTree() 调用（只更新 innerHTML，不重新注册监听器）
+        // Simulate multiple updateTree() calls (only innerHTML is updated, listeners are not re-registered)
         for (let i = 0; i < 5; i++) {
             rowContainer.innerHTML = `<a class="node-link" id="node-${i}">Node ${i}</a>`;
         }
 
-        // 点击最后一个元素
+        // Click the last element
         const lastNode = rowContainer.querySelector("#node-4")!;
         const clickEvent = new dom.window.MouseEvent("click", {
             bubbles: true,
@@ -96,16 +96,16 @@ describe("webviewScript 事件委托测试", () => {
         });
         lastNode.dispatchEvent(clickEvent);
 
-        // 验证事件处理器只被调用一次（没有累积）
-        assert.strictEqual(callCount, 1, "事件处理器应只被调用一次");
+        // Verify the handler is called only once (no accumulation)
+        assert.strictEqual(callCount, 1, "Event handler should be called only once");
     });
 
     /**
-     * 验证非目标元素不会触发事件处理
+     * Verifies non-target elements do not trigger event handling
      *
-     * 确保事件委托只对匹配选择器的元素生效。
+     * Ensures event delegation only applies to elements matching the selector.
      */
-    it("非 node-link 元素不应触发事件处理", () => {
+    it("non node-link elements should not trigger event handling", () => {
         let eventTriggered = false;
 
         rowContainer.addEventListener("click", (event: MouseEvent) => {
@@ -115,19 +115,19 @@ describe("webviewScript 事件委托测试", () => {
             }
         });
 
-        // 添加非 node-link 元素
+        // Add a non node-link element
         const otherElement = document.createElement("div");
         otherElement.classList.add("other-class");
         otherElement.textContent = "Not a node link";
         rowContainer.appendChild(otherElement);
 
-        // 触发点击事件
+        // Trigger a click event
         const clickEvent = new dom.window.MouseEvent("click", {
             bubbles: true,
             cancelable: true,
         });
         otherElement.dispatchEvent(clickEvent);
 
-        assert.strictEqual(eventTriggered, false, "非目标元素不应触发事件处理");
+        assert.strictEqual(eventTriggered, false, "Non-target element should not trigger event handling");
     });
 });

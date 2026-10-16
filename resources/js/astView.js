@@ -10,7 +10,7 @@ const logOutputCheckbox = document.getElementById("log-output-checkbox");
 const vscode = acquireVsCodeApi();
 
 /**
- * 全局状态类，用于管理webview的状态
+ * Global state class, manages the webview state
  */
 class GlobalState {
     docUri = "";
@@ -22,8 +22,8 @@ class GlobalState {
     logOutput = false;
 
     /**
-     * 设置状态
-     * @param {Object} state 状态对象
+     * Set the state
+     * @param {Object} state State object
      */
     setState(state) {
         Object.assign(this, state);
@@ -40,8 +40,8 @@ class GlobalState {
     }
 
     /**
-     * 设置文档URI
-     * @param {string} value 文档URI
+     * Set the document URI
+     * @param {string} value Document URI
      */
     setDocUri(value) {
         this.docUri = value;
@@ -49,8 +49,8 @@ class GlobalState {
     }
 
     /**
-     * 设置节点数组
-     * @param {Array} value 节点数组
+     * Set the node array
+     * @param {Array} value Array of nodes
      */
     setNodes(value = []) {
         this.nodes = value;
@@ -59,8 +59,8 @@ class GlobalState {
     }
 
     /**
-     * 设置是否启用查询
-     * @param {boolean} value 是否启用查询
+     * Set whether querying is enabled
+     * @param {boolean} value Whether querying is enabled
      */
     setEnableQuery(value) {
         this.enableQuery = value;
@@ -69,8 +69,8 @@ class GlobalState {
     }
 
     /**
-     * 设置查询文本
-     * @param {string} value 查询文本
+     * Set the query text
+     * @param {string} value Query text
      */
     setQueryText(value) {
         this.queryText = value;
@@ -78,8 +78,8 @@ class GlobalState {
     }
 
     /**
-     * 设置是否显示匿名节点
-     * @param {boolean} value 是否显示匿名节点
+     * Set whether anonymous nodes are shown
+     * @param {boolean} value Whether anonymous nodes are shown
      */
     setShowAnonymousNodes(value) {
         this.showAnonymousNodes = value;
@@ -87,8 +87,8 @@ class GlobalState {
     }
 
     /**
-     * 设置是否启用编辑器同步
-     * @param {boolean} value 是否启用编辑器同步
+     * Set whether editor synchronization is enabled
+     * @param {boolean} value Whether editor synchronization is enabled
      */
     setEnableNodeMapping(value) {
         this.enableNodeMapping = value;
@@ -96,7 +96,7 @@ class GlobalState {
     }
 
     /**
-     * 设置是否输出日志
+     * Set whether logs are output
      * @param {boolean} value 
      */
     setLogOutput(value){
@@ -106,9 +106,9 @@ class GlobalState {
 }
 
 (function () {
-    const globalState = new GlobalState(); // 每次重新加载页面时尝试恢复状态中的数据
+    const globalState = new GlobalState(); // Try to restore data from the state each time the page reloads
 
-    // 添加接收消息的监听
+    // Add a listener for incoming messages
     window.addEventListener("message", (event) => {
         const { command, data } = event.data;
         switch (command) {
@@ -116,18 +116,18 @@ class GlobalState {
                 globalState.setState(JSON.parse(data));
                 break;
             case "scroll":
-                // 随编辑器滚动
+                // Scroll along with the editor
                 const { line } = JSON.parse(data);
                 const items = document.getElementsByClassName(`row-${line}`);
                 items &&
                     items.length > 0 &&
                     items[0].scrollIntoView({
-                        behavior: "smooth", // 平滑滚动
-                        block: "start", // 元素顶部对齐视口顶部
+                        behavior: "smooth", // Smooth scrolling
+                        block: "start", // Align element top with viewport top
                     });
                 break;
             case "gotoNode":
-                // 定位到指定节点
+                // Go to the given node
                 const { id } = JSON.parse(data);
                 const element = document.getElementById(id);
                 if (element) {
@@ -141,43 +141,43 @@ class GlobalState {
         }
     });
 
-    // 监听显示匿名节点选择框的修改事件，并发送对应状态
+    // Listen for changes to the show anonymous nodes checkbox and send its state
     showAnonymousCheckbox.addEventListener("change", (that, event) => {
         const checked = showAnonymousCheckbox.checked;
         vscode.postMessage({ command: "showAnonymousNodes", value: checked });
         globalState.setShowAnonymousNodes(checked);
     });
 
-    // 监听启用查询选择框的修改事件，并发送对应状态
+    // Listen for changes to the enable query checkbox and send its state
     enableQueryCheckbox.addEventListener("change", (that, event) => {
         const checked = enableQueryCheckbox.checked;
         vscode.postMessage({ command: "enableQuery", value: checked });
         globalState.setEnableQuery(checked);
     });
 
-    // 监听查询输入框的修改事件，并发送对应数据
+    // Listen for changes to the query input and send its data
     queryTextarea.addEventListener("change", (that, event) => {
         const value = queryTextarea.value;
         vscode.postMessage({ command: "queryNode", value });
         globalState.setQueryText(queryTextarea.value);
-        // TODO 发送数据
+        // TODO send data
     });
 
-    // 监听节点映射选择框的修改事件，并发送对应状态
+    // Listen for changes to the node mapping checkbox and send its state
     nodeMappingCheckbox.addEventListener("change", (that, event) => {
         const checked = nodeMappingCheckbox.checked;
         vscode.postMessage({ command: "enableNodeMapping", value: checked });
         globalState.setEnableNodeMapping(nodeMappingCheckbox.checked);
     });
 
-    // 监听输出日志选择框的修改事件，并发送对应状态
+    // Listen for changes to the log output checkbox and send its state
     logOutputCheckbox.addEventListener("change", (that, event) => {
         const checked = logOutputCheckbox.checked;
         vscode.postMessage({ command: "logOutput", value: checked });
         globalState.setLogOutput(logOutputCheckbox.checked);
     });
 
-    // 监听body的鼠标点击事件，如果点击的不是节点，则发送一个空的位置数据
+    // Listen for clicks on body; if the click is not on a node, send empty position data
     document.body.addEventListener('click', ({ target }) => {
         if (!target.classList.contains("node-link")) {
             vscode.postMessage({ command: "selectEditorText", value: { startIndex: '', endIndex: '', isClick: true } });
@@ -187,8 +187,8 @@ class GlobalState {
 })();
 
 /**
- * 更新语法树
- * @param {Array} nodes 节点数组
+ * Update the syntax tree
+ * @param {Array} nodes Array of nodes
  */
 function updateTree(nodes) {
     if (!nodes || nodes.length <= 0) {
@@ -198,14 +198,14 @@ function updateTree(nodes) {
     const htmls = treeNodeToHtml(nodeArray);
     rowContianer.innerHTML = htmls.rows;
     rowNumberContainer.innerHTML = htmls.rowNumbers;
-    // 监听节点元素鼠标悬浮事件
+    // Listen for mouseover on node elements
     rowContianer.addEventListener("mouseover", (event) => {
         const element = event.target;
         if (element.classList.contains("node-link")) {
             vscode.postMessage({ command: "selectEditorText", value: JSON.parse(JSON.stringify(element.dataset)) });
         }
     });
-    // 监听节点元素鼠标点击事件
+    // Listen for clicks on node elements
     rowContianer.addEventListener("click", (event) => {
         const element = event.target;
         if (element.classList.contains("node-link")) {
@@ -221,9 +221,9 @@ function updateTree(nodes) {
 }
 
 /**
- * 将语法树节点转换为HTML
- * @param {Array} nodes 节点数组
- * @returns {Object} 包含HTML字符串的对象
+ * Convert syntax tree nodes to HTML
+ * @param {Array} nodes Array of nodes
+ * @returns {Object} Object containing HTML strings
  */
 function treeNodeToHtml(nodes) {
     let rows = "",
@@ -232,7 +232,7 @@ function treeNodeToHtml(nodes) {
         const node = nodes[i];
         const { row: startRow, column: startColumn } = node.startPosition;
         const { row: endRow, column: endColumn } = node.endPosition;
-        // 设置缩进
+        // Set indentation
         const indentHtml = `<span class="indent">&nbsp;&nbsp;</span>`.repeat(node.level);
         rows +=
             `<div class="row row-id-${node.id}">

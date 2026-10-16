@@ -1,20 +1,20 @@
 import assert from "assert";
 
 /**
- * 测试 Colors 类的颜色分配逻辑
+ * Tests the color assignment logic of the Colors class
  *
- * 由于 Colors 类使用模块级别的状态（NAMES 数组），
- * 我们直接测试其逻辑而不是导入实际的模块。
+ * Since the Colors class uses module-level state (the NAMES array),
+ * we test its logic directly instead of importing the actual module.
  */
-describe("Colors 颜色分配逻辑测试", () => {
-    // 模拟 COLORS 常量（与 colors.ts 中相同）
+describe("Colors color assignment logic", () => {
+    // Simulated COLORS constant (same as in colors.ts)
     const COLORS: string[] = [
         '#80cbc4', '#ffb757', '#e0b8ff', '#ff9492', '#56d364',
         '#a5d6ff', '#ffa198', '#d2a8ff', '#ff7b72', '#7ee787',
         '#ffa657', '#9ca3af', '#79c0ff'
     ];
 
-    // 模拟 Colors 类的逻辑
+    // Simulated Colors class logic
     class Colors {
         private static names: string[] = [];
 
@@ -36,23 +36,23 @@ describe("Colors 颜色分配逻辑测试", () => {
         }
     }
 
-    // 每个测试前重置状态
+    // Reset state before each test
     beforeEach(() => {
         Colors.reset();
     });
 
     /**
-     * 测试新名称的颜色分配
+     * Tests color assignment for a new name
      */
-    it("新名称应获得第一个颜色", () => {
+    it("new name should get the first color", () => {
         const color = Colors.getColorForCaptureName("function");
         assert.strictEqual(color, COLORS[0]);
     });
 
     /**
-     * 测试多个不同名称的颜色分配
+     * Tests color assignment for multiple different names
      */
-    it("不同名称应获得不同颜色", () => {
+    it("different names should get different colors", () => {
         const color1 = Colors.getColorForCaptureName("function");
         const color2 = Colors.getColorForCaptureName("variable");
         const color3 = Colors.getColorForCaptureName("keyword");
@@ -63,9 +63,9 @@ describe("Colors 颜色分配逻辑测试", () => {
     });
 
     /**
-     * 测试相同名称返回相同颜色
+     * Tests that the same name returns the same color
      */
-    it("相同名称应返回相同颜色", () => {
+    it("same name should return the same color", () => {
         const color1 = Colors.getColorForCaptureName("function");
         const color2 = Colors.getColorForCaptureName("function");
 
@@ -73,41 +73,41 @@ describe("Colors 颜色分配逻辑测试", () => {
     });
 
     /**
-     * 测试颜色循环
+     * Tests color cycling
      */
-    it("当名称数量超过颜色数量时，应循环使用颜色", () => {
-        // 添加 COLORS.length 个名称
+    it("should cycle colors when names outnumber colors", () => {
+        // Add COLORS.length names
         for (let i = 0; i < COLORS.length; i++) {
             Colors.getColorForCaptureName(`name-${i}`);
         }
 
-        // 添加第 COLORS.length + 1 个名称，应该获得第一个颜色
+        // Adding name number COLORS.length + 1 should get the first color
         const color = Colors.getColorForCaptureName("extra-name");
         assert.strictEqual(color, COLORS[0]);
     });
 
     /**
-     * 测试颜色循环的精确性
+     * Tests color cycling accuracy
      */
-    it("颜色循环应正确映射索引", () => {
-        // 添加 13 个名称（等于 COLORS 长度）
+    it("color cycling should map indexes correctly", () => {
+        // Add 13 names (equal to COLORS length)
         for (let i = 0; i < COLORS.length; i++) {
             Colors.getColorForCaptureName(`name-${i}`);
         }
 
-        // 第 14 个名称应该获得 COLORS[0]
+        // The 14th name should get COLORS[0]
         const color14 = Colors.getColorForCaptureName("name-13");
         assert.strictEqual(color14, COLORS[0]);
 
-        // 第 15 个名称应该获得 COLORS[1]
+        // The 15th name should get COLORS[1]
         const color15 = Colors.getColorForCaptureName("name-14");
         assert.strictEqual(color15, COLORS[1]);
     });
 
     /**
-     * 测试 reset 功能
+     * Tests the reset feature
      */
-    it("reset 应清空名称列表", () => {
+    it("reset should clear the name list", () => {
         Colors.getColorForCaptureName("function");
         Colors.getColorForCaptureName("variable");
 
@@ -119,9 +119,9 @@ describe("Colors 颜色分配逻辑测试", () => {
     });
 
     /**
-     * 测试 reset 后颜色重新分配
+     * Tests color reassignment after reset
      */
-    it("reset 后相同名称应重新获得第一个颜色", () => {
+    it("after reset the same name should get the first color again", () => {
         const color1 = Colors.getColorForCaptureName("function");
         assert.strictEqual(color1, COLORS[0]);
 
@@ -132,9 +132,9 @@ describe("Colors 颜色分配逻辑测试", () => {
     });
 
     /**
-     * 测试名称数量统计
+     * Tests name count tracking
      */
-    it("应正确统计已注册的名称数量", () => {
+    it("should correctly count registered names", () => {
         assert.strictEqual(Colors.getNamesCount(), 0);
 
         Colors.getColorForCaptureName("function");
@@ -143,27 +143,27 @@ describe("Colors 颜色分配逻辑测试", () => {
         Colors.getColorForCaptureName("variable");
         assert.strictEqual(Colors.getNamesCount(), 2);
 
-        // 重复名称不应增加计数
+        // Duplicate names should not increase the count
         Colors.getColorForCaptureName("function");
         assert.strictEqual(Colors.getNamesCount(), 2);
     });
 
     /**
-     * 测试边界情况：空字符串名称
+     * Tests edge case: empty string name
      */
-    it("应支持空字符串作为名称", () => {
+    it("should support empty string as a name", () => {
         const color = Colors.getColorForCaptureName("");
         assert.strictEqual(color, COLORS[0]);
 
-        // 再次请求空字符串应返回相同颜色
+        // Requesting the empty string again should return the same color
         const color2 = Colors.getColorForCaptureName("");
         assert.strictEqual(color, color2);
     });
 
     /**
-     * 测试边界情况：特殊字符名称
+     * Tests edge case: names with special characters
      */
-    it("应支持包含特殊字符的名称", () => {
+    it("should support names containing special characters", () => {
         const color1 = Colors.getColorForCaptureName("@function.builtin");
         const color2 = Colors.getColorForCaptureName("variable.parameter");
 
@@ -172,21 +172,21 @@ describe("Colors 颜色分配逻辑测试", () => {
     });
 
     /**
-     * 测试 COLORS 数组长度
+     * Tests COLORS array length
      */
-    it("COLORS 数组应有 13 个颜色", () => {
+    it("COLORS array should have 13 colors", () => {
         assert.strictEqual(COLORS.length, 13);
     });
 
     /**
-     * 测试颜色值格式
+     * Tests color value format
      */
-    it("所有颜色应为有效的十六进制格式", () => {
+    it("all colors should be valid hex format", () => {
         const hexColorRegex = /^#[0-9a-f]{6}$/;
         for (const color of COLORS) {
             assert.ok(
                 hexColorRegex.test(color),
-                `颜色 ${color} 不是有效的十六进制格式`
+                `Color ${color} is not a valid hex format`
             );
         }
     });

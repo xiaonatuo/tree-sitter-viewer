@@ -1,8 +1,8 @@
 # tree-sitter-viewer 
 
-这是一个类似于 `Tree-sitter` 官网[`游乐场`](https://tree-sitter.github.io/tree-sitter/7-playground.html)的`VS Code`扩展插件。  
-您可以使用该插件方便的查看不同开发语言的抽象语法树。  
-以下是目前支持查看语法树的语言列表：  
+A `VS Code` extension similar to the [`playground`](https://tree-sitter.github.io/tree-sitter/7-playground.html) on the official `Tree-sitter` website.  
+Use it to conveniently view the abstract syntax tree of code written in different languages.  
+The languages currently supported are:  
 - Bash
 - C
 - C++
@@ -22,15 +22,15 @@
 - Scala
 - TypeScript
 
-## 功能演示
+## Demo
 
-![功能演示](https://raw.githubusercontent.com/xiaonatuo/tree-sitter-viewer/refs/heads/master/resources/demo.gif)
+![Demo](https://raw.githubusercontent.com/xiaonatuo/tree-sitter-viewer/refs/heads/master/resources/demo.gif)
 
-## 已知问题
+## Known Issues
 
 https://github.com/xiaonatuo/tree-sitter-viewer/issues
 
-## 更多信息
+## More Information
 
 * [Github](https://github.com/xiaonatuo/tree-sitter-viewer)
 

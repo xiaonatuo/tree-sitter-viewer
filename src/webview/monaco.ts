@@ -10,10 +10,10 @@ self.MonacoEnvironment = {
         return editorWorkJsUri;
     }
 };
-// 注册语言
+// Register the language
 monaco.languages.register({ id: LANGUAGE_ID });
 
-// 自动闭合字符
+// Auto-closing characters
 monaco.languages.setLanguageConfiguration(LANGUAGE_ID, {
     autoClosingPairs: [
         { open: "(", close: ")" },
@@ -24,43 +24,43 @@ monaco.languages.setLanguageConfiguration(LANGUAGE_ID, {
     ],
 });
 const keywords = ['eq?', 'not-eq?', "any-eq?", "any-of?", 'match?', 'is?', 'is-not?', 'set!', 'select-adjacent!', 'strip!'];
-// 定义语法高亮
+// Define syntax highlighting
 monaco.languages.setMonarchTokensProvider(LANGUAGE_ID, {
     tokenizer: {
         root: [
-            // 捕获变量，如 @capture
+            // Capture variables, e.g. @capture
             [/@[a-zA-Z_][\w-]*/, "capture"],
 
-            // 查询操作符，如 (#match? ...)
+            // Query operators, e.g. (#match? ...)
             [/#\w+[\?\!]/, "keyword"],
 
-            // 字段属性，如 (name: ...)
+            // Field attributes, e.g. (name: ...)
             [/\w+\:/, "field"],
 
-            // 注释（以 ; 开头的部分）
+            // Comments (starting with ;)
             [/;.*/, "comment"],
 
-            // 双引号字符串
+            // Double-quoted strings
             [/"/, { token: "string", next: "@string" }],
 
-            // 单引号字符串
+            // Single-quoted strings
             [/'/, { token: "string", next: "@sqstring" }],
 
-            // S-expression 结构，如 (node_type ...)
+            // S-expression structure, e.g. (node_type ...)
             [/\(/, "paren"],
             [/\)/, "paren"],
 
-            // 标识符（节点类型）
+            // Identifiers (node types)
             [/[a-zA-Z_][\w-]*/, "identifier"],
         ],
 
-        // 处理双引号字符串
+        // Handle double-quoted strings
         string: [
             [/[^"]+/, "string"],
             [/"/, { token: "string", next: "@pop" }],
         ],
 
-        // 处理单引号字符串
+        // Handle single-quoted strings
         sqstring: [
             [/[^']+/, "string"],
             [/'/, { token: "string", next: "@pop" }],
@@ -68,7 +68,7 @@ monaco.languages.setMonarchTokensProvider(LANGUAGE_ID, {
     },
 });
 
-// 代码补全
+// Code completion
 monaco.languages.registerCompletionItemProvider(LANGUAGE_ID, {
     provideCompletionItems: (model, position) => {
         const word = model.getWordUntilPosition(position);
@@ -109,19 +109,19 @@ export interface QueryEditorOptions {
     themeConfig?: QueryEditorTheme
 }
 /**
- * 定义一个语法树查询编辑器类
+ * Syntax tree query editor class
  */
 export class QueryEditor {
-    // Monaco 编辑器
+    // Monaco editor
     private editor!: monaco.editor.IStandaloneCodeEditor;
-    // Monaco 编辑器配置项
+    // Monaco editor options
     private options: monaco.editor.IStandaloneEditorConstructionOptions;
     private model: monaco.editor.ITextModel;
     private errors: any[] = [];
     /**
-     * 语法树查询编辑器类构造函数
-     * @param element 编辑器渲染的目标元素
-     * @param options 编辑器配置选项
+     * Syntax tree query editor constructor
+     * @param element Target element the editor renders into
+     * @param options Editor configuration options
      */
     constructor(private element: HTMLElement, options: QueryEditorOptions) {
         this.options = {
@@ -130,8 +130,8 @@ export class QueryEditor {
             contextmenu: false,
             automaticLayout: true,
             renderValidationDecorations: "on",
-            quickSuggestions: false, // 关闭代码建议
-            suggestOnTriggerCharacters: false, // 关闭触发建议
+            quickSuggestions: false, // Disable code suggestions
+            suggestOnTriggerCharacters: false, // Disable trigger character suggestions
             hover: { sticky: false },
             folding: false
         };
@@ -140,8 +140,8 @@ export class QueryEditor {
     }
 
     /**
-     * 渲染编辑器实例
-     * @returns 编辑器实例
+     * Render the editor instance
+     * @returns Editor instance
      */
     public create() {
         if (!this.editor) {
@@ -152,11 +152,11 @@ export class QueryEditor {
     }
 
     /**
-     * 当编辑器中的文本发生变化时的监听
-     * @param changeEvent 编辑器中的文本发送变化时调用的处理函数
+     * Listen for text changes in the editor
+     * @param changeEvent Handler called when the editor text changes
      */
     public onValueChange(changeEvent: (value: string) => void) {
-        // TODO 应该返回 event.changes
+        // TODO should return event.changes
         this.editor.onDidChangeModelContent((event) => {
             changeEvent(this.editor.getValue());
 
@@ -167,7 +167,7 @@ export class QueryEditor {
 
     /**
      * 
-     * @param vlaue 设置编辑器文本内容
+     * @param vlaue Text content to set in the editor
      */
     public setValue(vlaue: string) {
         this.editor.setValue(vlaue);
@@ -192,8 +192,8 @@ export class QueryEditor {
     }
 
     /**
-     * 设置编辑器的主题颜色
-     * @param themeConfig 主题配置
+     * Set the editor theme colors
+     * @param themeConfig Theme configuration
      */
     private setTheme(themeConfig: QueryEditorTheme) {
         let baseTheme: monaco.editor.BuiltinTheme = 'vs-dark', colors = {};
